@@ -60,7 +60,7 @@ export AWS_DEFAULT_REGION=us-east-1
 **Recommended (Node >= 10.15.x)**
 
 
-```
+```ts
 const AWS = require('aws-sdk');
 
 const QueueUrl = <output queue url>;

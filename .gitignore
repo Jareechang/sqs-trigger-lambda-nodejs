@@ -1,0 +1,6 @@
+setup-env.sh
+dist
+terraform.tfstate.backup
+*.tfstate
+*.swp
+.terraform

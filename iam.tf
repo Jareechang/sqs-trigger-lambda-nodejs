@@ -25,6 +25,7 @@ data "aws_iam_policy_document" "sqs_access" {
 
 resource "aws_iam_user_policy" "user_policy" {
     name = "dev-policy"
+    user = aws_iam_user.dev_user.name
     policy = data.aws_iam_policy_document.sqs_access.json
 }
 

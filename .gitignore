@@ -1,6 +1,10 @@
 setup-env.sh
+setup-dev.sh
 dist
 terraform.tfstate.backup
 *.tfstate
 *.swp
 .terraform
+*.log
+test.js
+node_modules

@@ -1,5 +1,9 @@
 output "aws_iam_user" {
-    value = aws_iam_user.dev_user.unique_id
+    value = aws_iam_user.dev_user
+}
+
+output "aws_iam_access_id" {
+    value = aws_iam_access_key.dev_key.id
 }
 
 output "aws_iam_access_key" {

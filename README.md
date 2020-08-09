@@ -1,11 +1,18 @@
 ## SQS Trigger Lambda demo on Node.js
 
-Create a Lambda function zipped and stored in S3 to interact with SQS.
+
+Demonstration of IAM roles between AWS resources instance to sqs / lambda. 
+
+
+The infrastructure creates a instance which allows for single-user (ip based) via TLS access (or ssh).
+In addition, it provides a role attached to send messages to sqs.
+
 
 Quick demo few AWS services and concepts: 
 
 - AWS IAM roles (Dev, Instance and Lambda roles)
-- Ingest messaging sent to SQS using Lambda
+- EC2 Instance, Security Groups 
+- Ingest messages sent to SQS using Lambda (Via event trigger)
 - Lambda CW logs setup 
 - Lambda S3 store 
 - Terraform
@@ -14,6 +21,7 @@ Quick demo few AWS services and concepts:
 
 1. [Quick Start](#quick-start)  
 2. [Local Dev Testing](#local-dev-testing)  
+3. [Testing Within Instance](#testing-within-instance)  
 3. [Lambda Versioning](#lambda-versioning)  
 
 ### Quick Start
@@ -31,7 +39,11 @@ export AWS_DEFAULT_REGION=us-east-1
 
 2. Create Infrastructure  
 
+**Important:** Note down the `queue-url` of the sqs queue to be used later
+
 ```sh
+# ip address is important for instance access (This is important if you want to test with instance)
+export TF_VAR_local_ip_address=173.xxx.xxx 
 terraform init
 terraform plan
 terraform apply -auto-approve 
@@ -82,6 +94,33 @@ async function run() {
 }
 
 run();
+```
+### Testing Within Instance 
+
+Upon running the terraform script you should receive the blob of private key outputed into the terminal along with the instance public ip.
+
+
+1. Create a pem file (ex. `dev-key.pem`)
+2. Set proper permissions by running  
+```
+chmod 400 ./dev-key.pem
+```
+3. Ssh into the instance
+
+```sh
+ssh -i "dev-key.pem" ec2-user@<output-instance-ip>
+```
+
+4. Test out send message via the AWS cli
+
+```sh
+# Set the default region for the AWS cli
+export AWS_DEFAULT_REGION=us-east-1
+
+# Send a random message
+aws sqs send-message \
+--queue-url=<output-queue-url> \
+--message-body '{"data": "sending some message"}'
 ```
 
 ### Lambda Versioning 

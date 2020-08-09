@@ -8,3 +8,4 @@ terraform.tfstate.backup
 *.log
 test.js
 node_modules
+*.pem

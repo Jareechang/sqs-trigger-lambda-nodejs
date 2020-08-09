@@ -8,5 +8,12 @@ output "aws_iam_access_key" {
 
 output "aws_queue_url" {
     value = aws_sqs_queue.ingest_queue.id
+}
 
+output "instance_ip" {
+    value = aws_instance.dev.public_ip
+}
+
+output "ssh-key" {
+    value = tls_private_key.dev.private_key_pem
 }

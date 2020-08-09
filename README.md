@@ -15,7 +15,7 @@ Quick demo few AWS services and concepts:
 - Ingest messages sent to SQS using Lambda (Via event trigger)
 - Lambda CW logs setup 
 - Lambda S3 store 
-- Terraform
+- Terraform (>= v0.12.24)
 
 ### Sections
 

@@ -4,7 +4,7 @@
 Demonstration of IAM roles between AWS resources instance to sqs / lambda. 
 
 
-The infrastructure creates a instance which allows for single-user (ip based) via TLS access (or ssh).
+The infrastructure creates a instance which allows for single-user (local network ip) via TLS access (or ssh).
 In addition, it provides a role attached to send messages to sqs.
 
 
@@ -42,8 +42,8 @@ export AWS_DEFAULT_REGION=us-east-1
 **Important:** Note down the `queue-url` of the sqs queue to be used later
 
 ```sh
-# ip address is important for instance access (This is important if you want to test with instance)
-export TF_VAR_local_ip_address=173.xxx.xxx 
+# The IP address is important for instance access (This is important if you want to test with instance)
+export TF_VAR_local_ip_address=xxx.xxx.xxx 
 terraform init
 terraform plan
 terraform apply -auto-approve 

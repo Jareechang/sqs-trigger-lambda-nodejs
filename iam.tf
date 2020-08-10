@@ -81,17 +81,17 @@ data "aws_iam_policy_document" "sqs_lambda" {
 }
  
 resource "aws_iam_policy" "sqs_lambda_policy" {
-    name = "dev-policy"
+    name = "sqs-lambda-dev-policy"
     policy = data.aws_iam_policy_document.sqs_lambda.json
 }
 
 resource "aws_iam_role" "lambda_role" {
-    name               = "instance-sqs-role"
+    name               = "lambda-sqs-role"
     assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
 resource "aws_iam_policy_attachment" "attach_policy_to_role_lambda" {
-    name       = "test-attachment"
+    name       = "lambda-role-attachment"
     roles      = [aws_iam_role.lambda_role.name]
     policy_arn = aws_iam_policy.sqs_lambda_policy.arn
 }
@@ -137,7 +137,7 @@ data "aws_iam_policy_document" "instance_assume_role_policy" {
 }
  
 resource "aws_iam_policy" "sqs_instance_policy" {
-    name = "dev-policy"
+    name = "sqs-instance-dev-policy"
     policy = data.aws_iam_policy_document.sqs_instance.json
 }
 
@@ -147,7 +147,7 @@ resource "aws_iam_role" "instance_role" {
 }
 
 resource "aws_iam_policy_attachment" "attach_policy_to_role_instance" {
-    name       = "test-attachment"
+    name       = "instance-role-attachment"
     roles      = [aws_iam_role.instance_role.name]
     policy_arn = aws_iam_policy.sqs_instance_policy.arn
 }

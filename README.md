@@ -4,7 +4,7 @@
 Demonstration of IAM roles between AWS resources:  
 
 ```
-Flow: instance -> sqs -> lambda
+Flow: ec2 instance (send message) -> sqs (event source trigger) -> lambda
 
 ```
 

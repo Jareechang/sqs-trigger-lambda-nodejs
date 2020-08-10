@@ -97,7 +97,9 @@ run();
 ```
 ### Testing Within Instance 
 
-Upon running the terraform script you should receive the blob of private key outputed into the terminal along with the instance public ip.
+To run test on the whole setup to trigger queue message to be processed by the lambda, you’ll need ssh access to the instance.
+
+See below for instructions. Upon running the terraform script you should receive a blob of private key outputed into the terminal along with the instance public ip.
 
 
 1. Create a pem file (ex. `dev-key.pem`)
@@ -122,6 +124,8 @@ aws sqs send-message \
 --queue-url=<output-queue-url> \
 --message-body '{"data": "sending some message"}'
 ```
+
+5. Observe CloudWatch Log (It should output your queue message)
 
 ### Lambda Versioning 
 

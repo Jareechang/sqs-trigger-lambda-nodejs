@@ -11,3 +11,8 @@ variable "local_ip_address" {}
 variable "lambda_name" {
     default = "process-queue-function"
 }
+
+variable "lambda_timeout" {
+    default = 120
+}
+

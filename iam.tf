@@ -56,8 +56,11 @@ data "aws_iam_policy_document" "sqs_lambda" {
     version = "2012-10-17"
     statement {
         actions = [
-            "sqs:SendMessage",
             "sqs:GetQueueAttributes",
+            "sqs:GetQueueUrl",
+            "sqs:SendMessage",
+            "sqs:ReceiveMessage",
+            "sqs:ChangeMessageVisibility",
             "sqs:DeleteMessage"
         ]
         effect = "Allow"
@@ -74,8 +77,7 @@ data "aws_iam_policy_document" "sqs_lambda" {
         ]
         effect = "Allow"
         resources = [
-            "arn:aws:logs:*:*:*:log-group:/aws/lambda/${var.lambda_name}-${var.env}/*"
-            # Lambda resources goes here
+            "arn:aws:logs:*:*:*"
         ]
     }
 }
@@ -95,7 +97,6 @@ resource "aws_iam_policy_attachment" "attach_policy_to_role_lambda" {
     roles      = [aws_iam_role.lambda_role.name]
     policy_arn = aws_iam_policy.sqs_lambda_policy.arn
 }
-
 
 ###################
 # IAM - Instance 

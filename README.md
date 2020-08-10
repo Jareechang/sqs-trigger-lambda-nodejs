@@ -1,18 +1,24 @@
 ## SQS Trigger Lambda demo on Node.js
 
 
-Demonstration of IAM roles between AWS resources instance to sqs / lambda. 
+Demonstration of IAM roles between AWS resources:  
 
+```
+Flow: instance -> sqs -> lambda
 
-The infrastructure creates a instance which allows for single-user (local network ip) via TLS access (or ssh).
-In addition, it provides a role attached to send messages to sqs.
+```
 
+The infrastructure creates a instance which allows for single-user (local network ip) via SSH.
+This instance has a role attached to send messages to our SQS queue.
 
-Quick demo few AWS services and concepts: 
+When messages are sent to our SQS queue, our lambda function sources the event from the SQS queue. It does not do anything useful
+other than log out details of the message. However, the example can be extended to implement more useful logic (ex. making an api call, write results to DB).
+
+**Quick demo few AWS services and concepts:**
 
 - AWS IAM roles (Dev, Instance and Lambda roles)
 - EC2 Instance, Security Groups 
-- Ingest messages sent to SQS using Lambda (Via event trigger)
+- Ingest messages sent to SQS using Lambda (Event source SQS -> Lambda)
 - Lambda CW logs setup 
 - Lambda S3 store 
 - Terraform (>= v0.12.24)

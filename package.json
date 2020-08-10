@@ -1,6 +1,6 @@
 {
   "name": "lambda-sqs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "repository": "git@github.com:Jareechang/sqs-trigger-lambda-nodejs.git",
   "author": "Jerry Chang <therealjerrycan@gmail.com>",

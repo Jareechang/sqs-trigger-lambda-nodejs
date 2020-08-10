@@ -39,6 +39,62 @@ resource "aws_iam_user_policy" "user_policy" {
 # - Use other useful SQS methods for polling useful data (# of messages etc)
 # - CW logs permissions
 
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+    statement {
+        actions = [
+            "sts:AssumeRole",
+        ]
+
+        principals {
+            type = "Service"
+            identifiers = ["lambda.amazonaws.com"]
+        }
+    }
+}
+
+data "aws_iam_policy_document" "sqs_lambda" {
+    version = "2012-10-17"
+    statement {
+        actions = [
+            "sqs:SendMessage",
+            "sqs:GetQueueAttributes",
+            "sqs:DeleteMessage"
+        ]
+        effect = "Allow"
+        resources = [
+            aws_sqs_queue.ingest_queue.arn
+        ]
+    }
+
+    statement {
+        actions = [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+        ]
+        effect = "Allow"
+        resources = [
+            "arn:aws:logs:*:*:*:log-group:/aws/lambda/${var.lambda_name}-${var.env}/*"
+            # Lambda resources goes here
+        ]
+    }
+}
+ 
+resource "aws_iam_policy" "sqs_lambda_policy" {
+    name = "dev-policy"
+    policy = data.aws_iam_policy_document.sqs_lambda.json
+}
+
+resource "aws_iam_role" "lambda_role" {
+    name               = "instance-sqs-role"
+    assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+}
+
+resource "aws_iam_policy_attachment" "attach_policy_to_role_lambda" {
+    name       = "test-attachment"
+    roles      = [aws_iam_role.lambda_role.name]
+    policy_arn = aws_iam_policy.sqs_lambda_policy.arn
+}
 
 
 ###################
@@ -90,7 +146,7 @@ resource "aws_iam_role" "instance_role" {
     assume_role_policy = data.aws_iam_policy_document.instance_assume_role_policy.json
 }
 
-resource "aws_iam_policy_attachment" "attach_policy_to_instance" {
+resource "aws_iam_policy_attachment" "attach_policy_to_role_instance" {
     name       = "test-attachment"
     roles      = [aws_iam_role.instance_role.name]
     policy_arn = aws_iam_policy.sqs_instance_policy.arn

@@ -5,6 +5,13 @@
   "repository": "git@github.com:Jareechang/sqs-trigger-lambda-nodejs.git",
   "author": "Jerry Chang <therealjerrycan@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "postversion": "node ./scripts/version-lambda.js",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major"
+  },
   "dependencies": {
     "aws-sdk": "^2.729.0"
   }

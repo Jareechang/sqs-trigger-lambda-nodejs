@@ -68,3 +68,48 @@ resource "aws_instance" "dev" {
         Name = "Dev-Instance"
     }
 }
+
+# Lambda
+
+## Read the configuration from local files
+locals {
+    package_json = jsondecode(file("./package.json"))
+    build_folder = "dist"
+}
+
+resource "aws_s3_bucket" "lambda" {
+    bucket = "lambda-artifact-dev01"
+    acl    = "private"
+    region = var.aws_region
+    tags = {
+        Name        = "Dev"
+        Environment = "Dev"
+    }
+}
+
+resource "aws_s3_bucket_object" "lambda" {
+    bucket = aws_s3_bucket.lambda.id
+    key    = "main-${local.package_json.version}"
+    source = "${local.build_folder}/main-${local.package_json.version}.zip"
+}
+
+resource "aws_lambda_function" "process_queue" {
+    function_name = var.lambda_name
+    s3_bucket = "${aws_s3_bucket.lambda.id}"
+    s3_key = "${aws_s3_bucket_object.lambda.id}"
+    handler = "src/index.handler"
+    role = "${aws_iam_role.lambda_role.arn}"
+    timeout = 300
+    source_code_hash = "${filebase64sha256("dist/${aws_s3_bucket_object.lambda.id}.zip")}"
+    runtime = "nodejs12.x"
+    depends_on = [
+        #"aws_iam_role_policy_attachment.lambda_logs",
+        "aws_cloudwatch_log_group.sample_log_group"
+    ]
+}
+
+resource "aws_cloudwatch_log_group" "sample_log_group" {
+    name = "/aws/lambda/${var.lambda_name}-${var.env}"
+    retention_in_days = 3
+}
+

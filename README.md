@@ -8,8 +8,8 @@ Flow: ec2 instance (send message) -> sqs (event source trigger) -> lambda
 
 ```
 
-The infrastructure creates a instance which allows for single-user (local network ip) via SSH.
-This instance has a role attached to send messages to our SQS queue.
+The infrastructure creates an instance which allows for ip based access via SSH.
+This instance has a role attached to send messages to our specific SQS queue.
 
 When messages are sent to our SQS queue, our lambda function sources the event from the SQS queue. It does not do anything useful
 other than log out details of the message. However, the example can be extended to implement more useful logic (ex. making an api call, write results to DB).

@@ -3,9 +3,21 @@ provider "aws" {
   region  = "${var.aws_region}"
 }
 
+resource "aws_sqs_queue" "ingest_dlq" {
+    name = "ingest-queue-dql"
+    visibility_timeout_seconds = var.lambda_timeout
+    tags = {
+        Environment = "dev"
+    }
+}
+
 resource "aws_sqs_queue" "ingest_queue" {
     name = "ingest-queue"
     visibility_timeout_seconds = var.lambda_timeout
+    redrive_policy = jsonencode({
+        deadLetterTargetArn = aws_sqs_queue.ingest_dlq.arn,
+        maxReceiveCount: 2
+    })
     tags = {
         Environment = "dev"
     }

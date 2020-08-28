@@ -24,7 +24,7 @@ In addition, it handles failures of the lambda sourcing events from the ingestio
 - EC2 Instance, Security Groups 
 - Ingest messages sent to SQS using Lambda (Event source SQS -> Lambda)
 - Dead-letter Queue implementation for failed executions
-- Append DLQ messages into DynamoDB
+- Append DLQ messages into DynamoDB (TODO)
 - Lambda CW logs setup 
 - Lambda S3 store 
 - Terraform (>= v0.12.24)
@@ -34,7 +34,8 @@ In addition, it handles failures of the lambda sourcing events from the ingestio
 1. [Quick Start](#quick-start)  
 2. [Local Dev Testing](#local-dev-testing)  
 3. [Testing Within Instance](#testing-within-instance)
-3. [Lambda Versioning](#lambda-versioning)  
+4. [Lambda Versioning](#lambda-versioning)  
+5. [Learning](#learning)
 
 ### Quick Start
 
@@ -188,3 +189,36 @@ yarn run version:major
 terraform plan
 terraform apply -auto-approve 
 ```
+
+### Learning
+
+Through this exercise there are a few things that I felt were caveats and took some time to figure out.
+
+1. Sourcing from Dead letter SQS queues - Receive Message
+
+Sourcing from and getting messages is actually quite non-trivial. Messing around with `ReceiveMessageWaitTimeSeconds` to get it to show up properly was quite a pain
+
+An alternative solution is to append the data in these failed queues into dynamodb for easy querying, identification and debugging (stretch exercise).
+
+2. Terraform setup  `aws_iam_policy_attachment`
+
+When attaching one policy to a role is easy but the [terraform documention](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) does not really provide information on attaching multiple.
+
+A good way to do this is just to make another `aws_iam_policy_attachment` resource, example:
+
+```sh
+resource "aws_iam_policy_attachment" "attach_policy_to_role_instance_queue" {
+    name       = "instance-role-attachment-queue"
+    roles      = [aws_iam_role.instance_role.name]
+    policy_arn = aws_iam_policy.sqs_instance_policy.arn
+}
+
+resource "aws_iam_policy_attachment" "attach_policy_to_role_instance_queue-dlq" {
+    name       = "instance-role-attachment-queue"
+    roles      = [aws_iam_role.instance_role.name]
+    policy_arn = aws_iam_policy.dlq_sqs_instance_policy.arn
+}
+```
+
+**Important:** The **Big** caveat is that the name has to be the same. Otherwise, it only attaches the last defined iam policy attachment.
+

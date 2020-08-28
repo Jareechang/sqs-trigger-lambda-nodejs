@@ -34,6 +34,8 @@ In addition, it handles failures of the lambda sourcing events from the ingestio
 1. [Quick Start](#quick-start)  
 2. [Local Dev Testing](#local-dev-testing)  
 3. [Testing Within Instance](#testing-within-instance)
+    - [Success flow](#success-flow)  
+    - [Failure flow](#failure-flow)  
 4. [Lambda Versioning](#lambda-versioning)  
 5. [Learning](#learning)
 

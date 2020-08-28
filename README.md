@@ -90,7 +90,7 @@ export AWS_DEFAULT_REGION=us-east-1
 ```ts
 const AWS = require('aws-sdk');
 
-const QueueUrl = <output queue url>;
+const QueueUrl = <aws_queue_url>;
 
 const config = {
     apiVersion: '2012-11-05',
@@ -155,7 +155,7 @@ export AWS_DEFAULT_REGION=us-east-1
 
 # Send a failure message
 aws sqs send-message \
---queue-url=<aws_queue_url> \
+--queue-url=<aws_dlq_queue_url> \
 --message-body '{ "type": "ERROR", "message": "Simulate a failure"}'
 ```
 5. Observe the cloudWatch Log (It should output the error being thrown)
@@ -165,7 +165,7 @@ aws sqs send-message \
 ```
 # Receive the message from dlq 
 aws sqs receive-message \
---queue-url=<aws_queue_url>
+--queue-url=<aws_dlq_queue_url>
 ```
 
 ### Lambda Versioning 

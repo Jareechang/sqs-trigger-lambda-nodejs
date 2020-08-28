@@ -198,7 +198,9 @@ Through this exercise there are a few things that I felt were caveats and took s
 
 1. Sourcing from Dead letter SQS queues - Receive Message
 
-Sourcing from and getting messages is actually quite non-trivial. Messing around with `ReceiveMessageWaitTimeSeconds` to get it to show up properly was quite a pain
+Sourcing from and getting messages is actually quite non-trivial. Messing around with `ReceiveMessageWaitTimeSeconds` to get it to show up properly was quite a pain.
+
+This make querying and figuring out how many messages are in the dead letter queue difficult. An alternative design will be required.
 
 An alternative solution is to append the data in these failed queues into dynamodb for easy querying, identification and debugging (stretch exercise).
 

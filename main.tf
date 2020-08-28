@@ -5,7 +5,7 @@ provider "aws" {
 
 resource "aws_sqs_queue" "ingest_dlq" {
     name = "ingest-queue-dlq"
-    visibility_timeout_seconds = var.lambda_timeout
+    receive_wait_time_seconds = 20
     tags = {
         Environment = "dev"
     }

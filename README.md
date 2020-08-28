@@ -4,7 +4,9 @@
 Demonstration of IAM roles between AWS resources:  
 
 ```
-Flow: ec2 instance (send message) -> sqs (event source trigger) -> lambda
+Flow:
+
+EC2 instance (send message) -> sqs (event source trigger) -> Lambda (Execute function) -> Execution Failures -> sqs (Dead letter queue)
 
 ```
 
@@ -14,11 +16,15 @@ This instance has a role attached to send messages to our specific SQS queue.
 When messages are sent to our SQS queue, our lambda function sources the event from the SQS queue. It does not do anything useful
 other than log out details of the message. However, the example can be extended to implement more useful logic (ex. making an api call, write results to DB).
 
+In addition, it handles failures of the lambda sourcing events from the ingestion queue. The failed events will end up in the failed queue.
+
 **Quick demo few AWS services and concepts:**
 
 - AWS IAM roles (Dev, Instance and Lambda roles)
 - EC2 Instance, Security Groups 
 - Ingest messages sent to SQS using Lambda (Event source SQS -> Lambda)
+- Dead-letter Queue implementation for failed executions
+- Append DLQ messages into DynamoDB
 - Lambda CW logs setup 
 - Lambda S3 store 
 - Terraform (>= v0.12.24)
@@ -27,7 +33,7 @@ other than log out details of the message. However, the example can be extended 
 
 1. [Quick Start](#quick-start)  
 2. [Local Dev Testing](#local-dev-testing)  
-3. [Testing Within Instance](#testing-within-instance)  
+3. [Testing Within Instance](#testing-within-instance)
 3. [Lambda Versioning](#lambda-versioning)  
 
 ### Quick Start
@@ -119,19 +125,45 @@ chmod 400 ./dev-key.pem
 ssh -i "dev-key.pem" ec2-user@<output-instance-ip>
 ```
 
-4. Test out send message via the AWS cli
+#### Success flow
+4. Test out send message via the AWS cli (success message)
 
 ```sh
 # Set the default region for the AWS cli
 export AWS_DEFAULT_REGION=us-east-1
 
-# Send a random message
+# Send a success message 
 aws sqs send-message \
---queue-url=<output-queue-url> \
---message-body '{"data": "sending some message"}'
+--queue-url=<aws_queue_url> \
+--message-body '{"type": "DATA", "message": "sending some message"}'
 ```
 
-5. Observe CloudWatch Log (It should output your queue message)
+5. Observe the cloudWatch Log (It should output your queue message)
+
+#### Failure flow
+
+The lambda is configured to simulate event given a specific type of message with `type: ERROR`.
+
+4. Test out send message via the AWS cli (failure message)
+
+```sh
+# Set the default region for the AWS cli
+export AWS_DEFAULT_REGION=us-east-1
+
+# Send a failure message
+aws sqs send-message \
+--queue-url=<aws_queue_url> \
+--message-body '{ "type": "ERROR", "message": "Simulate a failure"}'
+```
+5. Observe the cloudWatch Log (It should output the error being thrown)
+
+6. Receive message from the dead-letter-queue
+
+```
+# Receive the message from dlq 
+aws sqs receive-message \
+--queue-url=<aws_queue_url>
+```
 
 ### Lambda Versioning 
 

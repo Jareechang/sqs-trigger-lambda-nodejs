@@ -123,6 +123,23 @@ data "aws_iam_policy_document" "sqs_instance" {
     }
 }
 
+## Policy to allow send message from instance
+data "aws_iam_policy_document" "dlq_sqs_instance" {
+    version = "2012-10-17"
+    statement {
+        actions = [
+            "sqs:GetQueueAttributes",
+            "sqs:GetQueueUrl",
+            "sqs:SendMessage",
+            "sqs:ReceiveMessage",
+        ]
+        effect = "Allow"
+        resources = [
+            aws_sqs_queue.ingest_dlq.arn
+        ]
+    }
+}
+
 ## Policy for instance to assume a role 
 data "aws_iam_policy_document" "instance_assume_role_policy" {
     statement {
@@ -142,15 +159,26 @@ resource "aws_iam_policy" "sqs_instance_policy" {
     policy = data.aws_iam_policy_document.sqs_instance.json
 }
 
+resource "aws_iam_policy" "dlq_sqs_instance_policy" {
+    name = "sqs-instance-dev-policy-dlq"
+    policy = data.aws_iam_policy_document.dlq_sqs_instance.json
+}
+
 resource "aws_iam_role" "instance_role" {
     name               = "instance-sqs-role"
     assume_role_policy = data.aws_iam_policy_document.instance_assume_role_policy.json
 }
 
-resource "aws_iam_policy_attachment" "attach_policy_to_role_instance" {
-    name       = "instance-role-attachment"
+resource "aws_iam_policy_attachment" "attach_policy_to_role_instance_queue" {
+    name       = "instance-role-attachment-queue"
     roles      = [aws_iam_role.instance_role.name]
     policy_arn = aws_iam_policy.sqs_instance_policy.arn
+}
+
+resource "aws_iam_policy_attachment" "attach_policy_to_role_instance_queue-dlq" {
+    name       = "instance-role-attachment-queue"
+    roles      = [aws_iam_role.instance_role.name]
+    policy_arn = aws_iam_policy.dlq_sqs_instance_policy.arn
 }
 
 resource "aws_iam_instance_profile" "custom_web_profile" {

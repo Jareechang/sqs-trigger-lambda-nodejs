@@ -10,6 +10,10 @@ output "aws_queue_url" {
     value = aws_sqs_queue.ingest_queue.id
 }
 
+output "aws_dlq_queue_url" {
+    value = aws_sqs_queue.ingest_dlq.id
+}
+
 output "instance_ip" {
     value = aws_instance.dev.public_ip
 }
